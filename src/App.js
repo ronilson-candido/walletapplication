@@ -1,12 +1,13 @@
 // src/App.js
 
-import React from "react";
-import { Route, Routes } from "react-router-dom";
-import Login from "./components/Login";
-import Home from "./components/Home";
-import Register from "./components/Register";
-import AddPhone from "./components/AddPhone";
-import VerifyCode from "./components/VerifyCode";
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Login from './components/Login';
+import Home from './components/Home';
+import Register from './components/Register';
+import AddPhone from './components/AddPhone';
+import VerifyCode from './components/VerifyCode';
+import AddCard from './components/AddCard'; // Importar a página de adicionar cartão
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/add-phone" element={<AddPhone />} />
       <Route path="/verify-code" element={<VerifyCode />} />
+      <Route path="/add-card" element={<AddCard />} /> {/* Página para adicionar cartão */}
     </Routes>
   );
 };
