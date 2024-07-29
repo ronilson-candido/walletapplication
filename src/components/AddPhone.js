@@ -1,72 +1,48 @@
-// src/components/AddPhone.js
-
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const AddPhone = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [verificationId, setVerificationId] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSendCode = () => {
     setLoading(true);
-    axios.post("http://localhost:3000/send-code", { phoneNumber })
-      .then((response) => {
-        setLoading(false);
-        if (response.data.success) {
-          setVerificationId(response.data.verificationId); // Armazena o ID de verificação
-          setError("");
-          console.log("Código de verificação enviado");
-        } else {
-          setError("Erro ao enviar código. Verifique o número e tente novamente.");
-        }
-      })
-      .catch((error) => {
-        setLoading(false);
-        setError("Erro ao enviar código. Tente novamente.");
-        console.error("Erro ao enviar código:", error);
-      });
+    setTimeout(() => {
+      setLoading(false);
+      navigate("/verify-code", { state: { phoneNumber } });
+    }, 1000); 
   };
 
   const handleVerifyCode = () => {
     setLoading(true);
-    axios.post("http://localhost:3001/verify-code", { verificationId, verificationCode })
-      .then((response) => {
-        setLoading(false);
-        if (response.data.success) {
-          console.log("Número verificado com sucesso");
-          navigate("/dashboard"); // Redireciona para a página de sucesso
-        } else {
-          setError("Código inválido. Tente novamente.");
-        }
-      })
-      .catch((error) => {
-        setLoading(false);
-        setError("Erro ao verificar código. Tente novamente.");
-        console.error("Erro ao verificar código:", error);
-      });
+    setTimeout(() => {
+      setLoading(false);
+      navigate("/header");
+    }, 1000); 
   };
 
   return (
     <Container>
       <Form>
         <Title>Adicionar Número de Telefone</Title>
-        <Input
-          type="tel"
-          placeholder="Número de Telefone"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          disabled={loading}
-        />
-        <Button onClick={handleSendCode} disabled={loading}>
-          {loading ? "Enviando..." : "Enviar Código"}
-        </Button>
-        {verificationId && (
+        {!verificationCode ? (
+          <>
+            <Input
+              type="tel"
+              placeholder="Número de Telefone"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              disabled={loading}
+            />
+            <Button onClick={handleSendCode} disabled={loading}>
+              {loading ? "Enviando..." : "Enviar Código"}
+            </Button>
+          </>
+        ) : (
           <>
             <Input
               type="text"
@@ -76,7 +52,7 @@ const AddPhone = () => {
               disabled={loading}
             />
             <Button onClick={handleVerifyCode} disabled={loading}>
-              {loading ? "Verificando..." : "Verificar Código"}
+              {loading ? "Verificando..." : "Confirmar Código"}
             </Button>
           </>
         )}
@@ -95,7 +71,6 @@ const Container = styled.div`
   background-color: #f7f7f7;
   font-family: 'Montserrat', sans-serif;
 `;
-
 
 const Form = styled.div`
   background: white;
