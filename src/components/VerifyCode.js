@@ -94,7 +94,7 @@ const Button = styled.button`
 `;
 
 const Error = styled.p`
-  color: #d9534f;
+  color: #fffff;
   margin-top: 10px;
   text-align: center;
 `;
