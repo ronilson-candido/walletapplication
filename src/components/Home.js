@@ -36,6 +36,10 @@ const Home = () => {
     navigate('/add-card');
   };
 
+  const handleTransferMoney = () => {
+    navigate('/transfer-money'); 
+  };
+
   const getCardFlag = (number) => {
     if (number.startsWith('4')) {
       return 'https://logopng.com.br/logos/visa-17.png';
@@ -64,6 +68,7 @@ const Home = () => {
         </h1>
         <ButtonContainer>
           <Button onClick={handleAddCard}>Adicionar Cartão</Button>
+          <Button onClick={handleTransferMoney}>Transferir Dinheiro</Button>
         </ButtonContainer>
         {cards.length > 0 ? (
           <CardList>
