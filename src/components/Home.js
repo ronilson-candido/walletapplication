@@ -42,7 +42,7 @@ const Home = () => {
     } else if (number.startsWith('5')) {
       return 'https://brand.mastercard.com/content/dam/mccom/brandcenter/thumbnails/BR-PT/mcbc_refeicao-rev_84px.png';
     }
-    return 'https://www.example.com/path-to-default-flag.png'; // Substitua por uma bandeira padrão ou deixe em branco
+    return 'https://credittis.com.br/wp-content/uploads/2023/07/1-edited.png'; 
   };
 
   return (

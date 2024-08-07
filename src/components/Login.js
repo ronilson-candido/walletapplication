@@ -19,7 +19,7 @@ const Login = () => {
         email: user.email,
         photoURL: user.photoURL,
       });
-      navigate("/add-phone"); // Redireciona para a página de adição de telefone
+      navigate("/add-phone"); 
     } catch (error) {
       console.error("Erro ao fazer login com Google:", error);
     }

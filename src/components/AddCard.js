@@ -4,19 +4,28 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
+
+const encrypt = (data) => {
+  return btoa(data); 
+};
+
+const decrypt = (data) => {
+  return atob(data); 
+};
+
 const AddCard = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
-  const [cardHolder, setCardHolder] = useState(""); // Novo campo para o nome do titular
+  const [cardHolder, setCardHolder] = useState(""); 
   const navigate = useNavigate();
 
   const handleAddCard = () => {
     const card = {
-      number: cardNumber,
-      expiryDate,
-      cvv,
-      cardHolder,
+      number: encrypt(cardNumber),
+      expiryDate: encrypt(expiryDate),
+      cvv: encrypt(cvv),
+      cardHolder: encrypt(cardHolder),
     };
 
     const savedCards = JSON.parse(localStorage.getItem('cards')) || [];

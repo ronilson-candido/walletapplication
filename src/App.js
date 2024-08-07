@@ -7,7 +7,8 @@ import Home from './components/Home';
 import Register from './components/Register';
 import AddPhone from './components/AddPhone';
 import VerifyCode from './components/VerifyCode';
-import AddCard from './components/AddCard'; // Importar a página de adicionar cartão
+import AddCard from './components/AddCard'; 
+
 
 const App = () => {
   return (
