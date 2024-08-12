@@ -1,38 +1,52 @@
-// src/components/AddCard.js
-
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
-
-const encrypt = (data) => {
-  return btoa(data); 
-};
-
-const decrypt = (data) => {
-  return atob(data); 
-};
 
 const AddCard = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
-  const [cardHolder, setCardHolder] = useState(""); 
+  const [cardHolder, setCardHolder] = useState("");
+  const [error, setError] = useState(null); 
   const navigate = useNavigate();
 
   const handleAddCard = () => {
     const card = {
-      number: encrypt(cardNumber),
-      expiryDate: encrypt(expiryDate),
-      cvv: encrypt(cvv),
-      cardHolder: encrypt(cardHolder),
+      number: cardNumber,
+      expiryDate: expiryDate,
+      cvv: cvv,
+      cardHolder: cardHolder,
     };
+
 
     const savedCards = JSON.parse(localStorage.getItem('cards')) || [];
     savedCards.push(card);
     localStorage.setItem('cards', JSON.stringify(savedCards));
 
-    navigate('/home');
+    fetch('http://localhost:3001/api/cards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(card),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+
+          navigate('/home');
+        } else {
+          setError('Erro ao adicionar cartão no backend.');
+
+          navigate('/home');
+        }
+      })
+      .catch(error => {
+        setError('Erro ao comunicar com o backend.');
+        console.error('Erro ao adicionar cartão:', error);
+        
+        navigate('/home');
+      });
   };
 
   return (
@@ -90,6 +104,7 @@ const AddCard = () => {
         />
         
         <Button onClick={handleAddCard}>Adicionar Cartão</Button>
+        {error && <ErrorMessage>{error}</ErrorMessage>} { }
       </CardForm>
     </Container>
   );
@@ -198,6 +213,12 @@ const Button = styled.button`
   &:hover {
     background-color: #0056b3;
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
 `;
 
 export default AddCard;

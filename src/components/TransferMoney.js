@@ -49,10 +49,10 @@ const TransferMoney = () => {
 
   return (
     <Container>
-      <Title>Simulação de Transferência</Title>
+      <Title>Transferência via Carteira Digital</Title>
       {!showReceipt ? (
         <Form>
-          <Label htmlFor="recipientEmail">Email do Destinatário</Label>
+          <Label htmlFor="recipientEmail">Gmail do Destinatário</Label>
           <Input
             id="recipientEmail"
             type="email"
@@ -61,7 +61,7 @@ const TransferMoney = () => {
             onChange={(e) => setRecipientEmail(e.target.value)}
           />
 
-          <Label htmlFor="amount">Quantia</Label>
+          <Label htmlFor="amount">Valor</Label>
           <Input
             id="amount"
             type="text"
