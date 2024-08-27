@@ -1,23 +1,63 @@
-// src/components/TransferMoney.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
+import { toast, ToastContainer } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const TransferMoney = () => {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [balance, setBalance] = useState(12000);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    setTransactions(storedTransactions);
+
+    const storedBalance = JSON.parse(localStorage.getItem('balance')) || 12000;
+    setBalance(storedBalance);
+  }, []);
 
   const handleTransfer = () => {
     setLoading(true);
-    setTimeout(() => {
-      setShowReceipt(true);
+
+   
+    if (!recipientEmail.endsWith('@gmail.com')) {
+      toast.error("Só é possível transferir para contas Google.");
       setLoading(false);
-    }, 3000); 
+      return;
+    }
+
+    setTimeout(() => {
+      const transferAmount = parseFloat(amount.replace(/[^\d]/g, '') / 100);
+      
+      if (balance >= transferAmount) {
+        const newTransaction = {
+          email: recipientEmail,
+          amount: transferAmount,
+          date: new Date().toLocaleString(),
+        };
+        
+        const updatedTransactions = [...transactions, newTransaction];
+        setTransactions(updatedTransactions);
+        localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+
+        const newBalance = balance - transferAmount;
+        setBalance(newBalance);
+        localStorage.setItem('balance', JSON.stringify(newBalance));
+
+        setShowReceipt(true);
+        toast.success(`Transferência de ${formatAmount(amount)} para ${recipientEmail} concluída com sucesso!`);
+      } else {
+        toast.error("Saldo insuficiente.");
+      }
+      
+      setLoading(false);
+    }, 3000);
   };
 
   const handleGeneratePDF = () => {
@@ -47,9 +87,14 @@ const TransferMoney = () => {
     setAmount(formatAmount(value));
   };
 
+  const viewTransactionHistory = () => {
+    navigate('/history');
+  };
+
   return (
     <Container>
       <Title>Transferência via Carteira Digital</Title>
+      <Balance>Saldo Atual: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance)}</Balance>
       {!showReceipt ? (
         <Form>
           <Label htmlFor="recipientEmail">Gmail do Destinatário</Label>
@@ -86,6 +131,8 @@ const TransferMoney = () => {
           </ButtonContainer>
         </Receipt>
       )}
+      <HistoryButton onClick={viewTransactionHistory}>Ver Histórico de Transações</HistoryButton>
+      <ToastContainer />
     </Container>
   );
 };
@@ -104,6 +151,12 @@ const Container = styled.div`
 const Title = styled.h1`
   margin-bottom: 20px;
   color: #333;
+`;
+
+const Balance = styled.p`
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
 `;
 
 const Form = styled.div`
@@ -175,6 +228,20 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 10px;
+`;
+
+const HistoryButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  &:hover {
+    background-color: #218838;
+  }
 `;
 
 export default TransferMoney;

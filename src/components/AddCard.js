@@ -8,9 +8,11 @@ const AddCard = () => {
   const [cvv, setCvv] = useState("");
   const [cardHolder, setCardHolder] = useState("");
   const [error, setError] = useState(null); 
+  const [showPopup, setShowPopup] = useState(false); 
   const navigate = useNavigate();
 
-  const handleAddCard = () => {
+  const handleAddCard = async () => {
+    console.log("handleAddCard foi chamado");
     const card = {
       number: cardNumber,
       expiryDate: expiryDate,
@@ -18,35 +20,45 @@ const AddCard = () => {
       cardHolder: cardHolder,
     };
 
+    if (!cardNumber || !expiryDate || !cvv || !cardHolder) {
+      setError('Por favor, preencha todos os campos.');
+      return;
+    }
 
     const savedCards = JSON.parse(localStorage.getItem('cards')) || [];
     savedCards.push(card);
     localStorage.setItem('cards', JSON.stringify(savedCards));
 
-    fetch('http://localhost:3001/api/cards', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(card),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-
-          navigate('/home');
-        } else {
-          setError('Erro ao adicionar cartão no backend.');
-
-          navigate('/home');
-        }
-      })
-      .catch(error => {
-        setError('Erro ao comunicar com o backend.');
-        console.error('Erro ao adicionar cartão:', error);
-        
-        navigate('/home');
+    try {
+      const response = await fetch('http://localhost:3001/api/cards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(card),
       });
+
+      if (!response.ok) {
+        throw new Error('Erro na resposta do servidor');
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("Cartão adicionado com sucesso");
+        setShowPopup(true);
+        setTimeout(() => {
+          console.log("Redirecionando para a página inicial");
+          setShowPopup(false);
+          navigate('/home');
+        }, 1000); 
+      } else {
+        setError('Erro ao adicionar cartão no backend.');
+      }
+    } catch (error) {
+      setError('Erro ao comunicar com o backend.');
+      console.error('Erro ao adicionar cartão:', error);
+    }
   };
 
   return (
@@ -104,8 +116,16 @@ const AddCard = () => {
         />
         
         <Button onClick={handleAddCard}>Adicionar Cartão</Button>
-        {error && <ErrorMessage>{error}</ErrorMessage>} { }
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </CardForm>
+
+      {showPopup && (
+        <Popup>
+          <PopupContent>
+            <PopupText>Cartão Adicionado com Sucesso!</PopupText>
+          </PopupContent>
+        </Popup>
+      )}
     </Container>
   );
 };
@@ -219,6 +239,30 @@ const ErrorMessage = styled.p`
   color: red;
   font-size: 14px;
   margin-top: 10px;
+`;
+
+const Popup = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+`;
+
+const PopupContent = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+`;
+
+const PopupText = styled.p`
+  font-size: 18px;
+  color: #333;
 `;
 
 export default AddCard;

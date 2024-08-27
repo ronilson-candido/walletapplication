@@ -8,7 +8,8 @@ import Register from './components/Register';
 import AddPhone from './components/AddPhone';
 import VerifyCode from './components/VerifyCode';
 import AddCard from './components/AddCard';
-import TransferMoney from './components/TransferMoney'; // Importe o novo componente
+import TransferMoney from './components/TransferMoney';
+import TransactionHistory from './components/TransactionHistory'; // Importe o novo componente
 
 const App = () => {
   return (
@@ -18,8 +19,9 @@ const App = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/add-phone" element={<AddPhone />} />
       <Route path="/verify-code" element={<VerifyCode />} />
-      <Route path="/add-card" element={<AddCard />} /> {}
-      <Route path="/transfer-money" element={<TransferMoney />} /> {}
+      <Route path="/add-card" element={<AddCard />} />
+      <Route path="/transfer-money" element={<TransferMoney />} />
+      <Route path="/history" element={<TransactionHistory />} /> {}
     </Routes>
   );
 };
