@@ -11,14 +11,21 @@ const AddCard = () => {
   const [showPopup, setShowPopup] = useState(false); 
   const navigate = useNavigate();
 
-  const handleAddCard = async () => {
-    console.log("handleAddCard foi chamado");
-    const card = {
+  // Factory Method para criar o cartão
+  const createCard = () => {
+    return {
       number: cardNumber,
       expiryDate: expiryDate,
       cvv: cvv,
       cardHolder: cardHolder,
     };
+  };
+
+  const handleAddCard = async () => {
+    console.log("handleAddCard foi chamado");
+
+    // Usando o Factory Method para criar o cartão
+    const card = createCard();
 
     if (!cardNumber || !expiryDate || !cvv || !cardHolder) {
       setError('Por favor, preencha todos os campos.');
