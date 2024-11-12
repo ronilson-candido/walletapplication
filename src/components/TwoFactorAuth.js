@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
+import { sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
 import { auth } from "../config/firebase";
 
 const TwoFactorAuth = ({ email }) => {

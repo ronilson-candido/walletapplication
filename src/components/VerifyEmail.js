@@ -16,7 +16,6 @@ const VerifyEmail = () => {
           throw new Error("Link de verificação inválido");
         }
 
-        // Recupera o e-mail armazenado localmente
         const email = window.localStorage.getItem('emailForSignIn');
         if (!email) {
           throw new Error("E-mail não encontrado");

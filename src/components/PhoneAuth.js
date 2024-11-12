@@ -10,7 +10,7 @@ const PhoneAuth = () => {
   const [verificationId, setVerificationId] = useState('');
 
   useEffect(() => {
-    // Configurar RecaptchaVerifier quando o componente é montado
+
     getRecaptchaVerifier();
   }, []);
 
@@ -24,6 +24,7 @@ const PhoneAuth = () => {
       console.error('Erro ao enviar o código de verificação:', error);
     }
   };
+  
 
   const handleVerifyCode = async () => {
     try {

@@ -5,6 +5,67 @@ import jsPDF from 'jspdf';
 import { toast, ToastContainer } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css'; 
 
+// Estratégia de Transferência
+class TransferStrategy {
+  constructor(balance, transactions, setTransactions, setBalance) {
+    this.balance = balance;
+    this.transactions = transactions;
+    this.setTransactions = setTransactions;
+    this.setBalance = setBalance;
+  }
+
+  transfer(recipientEmail, amount, setLoading, setShowReceipt) {
+    setLoading(true);
+
+    if (!recipientEmail.endsWith('@gmail.com')) {
+      toast.error("Só é possível transferir para contas Google.");
+      setLoading(false);
+      return;
+    }
+
+    const transferAmount = parseFloat(amount.replace(/[^\d]/g, '') / 100);
+
+    if (this.balance >= transferAmount) {
+      const newTransaction = {
+        email: recipientEmail,
+        amount: transferAmount,
+        date: new Date().toLocaleString(),
+      };
+
+      const updatedTransactions = [...this.transactions, newTransaction];
+      this.setTransactions(updatedTransactions);
+      localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+
+      const newBalance = this.balance - transferAmount;
+      this.setBalance(newBalance);
+      localStorage.setItem('balance', JSON.stringify(newBalance));
+
+      setShowReceipt(true);
+      toast.success(`Transferência de ${amount} para ${recipientEmail} concluída com sucesso!`);
+    } else {
+      toast.error("Saldo insuficiente.");
+    }
+
+    setLoading(false);
+  }
+}
+
+// Estratégia de Gerar PDF
+class GeneratePDFStrategy {
+  generatePDF(recipientEmail, amount) {
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Comprovante de Transferência", 20, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Email do Destinatário: ${recipientEmail}`, 20, 40);
+    doc.text(`Quantia Enviada: ${amount}`, 20, 60);
+
+    doc.save("comprovante_transferencia.pdf");
+  }
+}
+
 const TransferMoney = () => {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [amount, setAmount] = useState("");
@@ -22,55 +83,15 @@ const TransferMoney = () => {
     setBalance(storedBalance);
   }, []);
 
+  const transferStrategy = new TransferStrategy(balance, transactions, setTransactions, setBalance);
+  const generatePDFStrategy = new GeneratePDFStrategy();
+
   const handleTransfer = () => {
-    setLoading(true);
-
-   
-    if (!recipientEmail.endsWith('@gmail.com')) {
-      toast.error("Só é possível transferir para contas Google.");
-      setLoading(false);
-      return;
-    }
-
-    setTimeout(() => {
-      const transferAmount = parseFloat(amount.replace(/[^\d]/g, '') / 100);
-      
-      if (balance >= transferAmount) {
-        const newTransaction = {
-          email: recipientEmail,
-          amount: transferAmount,
-          date: new Date().toLocaleString(),
-        };
-        
-        const updatedTransactions = [...transactions, newTransaction];
-        setTransactions(updatedTransactions);
-        localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
-
-        const newBalance = balance - transferAmount;
-        setBalance(newBalance);
-        localStorage.setItem('balance', JSON.stringify(newBalance));
-
-        setShowReceipt(true);
-        toast.success(`Transferência de ${formatAmount(amount)} para ${recipientEmail} concluída com sucesso!`);
-      } else {
-        toast.error("Saldo insuficiente.");
-      }
-      
-      setLoading(false);
-    }, 3000);
+    transferStrategy.transfer(recipientEmail, amount, setLoading, setShowReceipt);
   };
 
   const handleGeneratePDF = () => {
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text("Comprovante de Transferência", 20, 20);
-
-    doc.setFontSize(12);
-    doc.text(`Email do Destinatário: ${recipientEmail}`, 20, 40);
-    doc.text(`Quantia Enviada: ${amount}`, 20, 60);
-
-    doc.save("comprovante_transferencia.pdf");
+    generatePDFStrategy.generatePDF(recipientEmail, amount);
   };
 
   const formatAmount = (value) => {

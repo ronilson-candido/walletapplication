@@ -1,8 +1,7 @@
-// src/config/firebase.js
 
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, RecaptchaVerifier } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDLAP4JitTvUujRu23pR7uZf39DMBs1OSk",
@@ -14,11 +13,8 @@ const firebaseConfig = {
   measurementId: "G-GY30WXCMNL"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const analytics = getAnalytics(app);
-
 const googleProvider = new GoogleAuthProvider();
 
 
