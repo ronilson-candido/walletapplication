@@ -3,6 +3,39 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 
+// Command para Deletar Transação
+class DeleteTransactionCommand {
+  constructor(transactionIndex, transactions, setTransactions) {
+    this.transactionIndex = transactionIndex;
+    this.transactions = transactions;
+    this.setTransactions = setTransactions;
+  }
+
+  execute() {
+    const updatedTransactions = this.transactions.filter((_, i) => i !== this.transactionIndex);
+    this.setTransactions(updatedTransactions);
+    localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+  }
+}
+
+// Command para Gerar PDF
+class GeneratePDFCommand {
+  constructor(transaction) {
+    this.transaction = transaction;
+  }
+
+  execute() {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Comprovante de Transação", 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Email do Destinatário: ${this.transaction.email}`, 20, 40);
+    doc.text(`Quantia Enviada: ${this.transaction.amount}`, 20, 60);
+    doc.text(`Data: ${this.transaction.date}`, 20, 80);
+    doc.save("comprovante_transacao.pdf");
+  }
+}
+
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
   const navigate = useNavigate();
@@ -12,28 +45,12 @@ const TransactionHistory = () => {
     setTransactions(storedTransactions);
   }, []);
 
-  const handleDelete = (index) => {
-    const updatedTransactions = transactions.filter((_, i) => i !== index);
-    setTransactions(updatedTransactions);
-    localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
-  };
-
-  const handleGeneratePDF = (transaction) => {
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text("Comprovante de Transação", 20, 20);
-
-    doc.setFontSize(12);
-    doc.text(`Email do Destinatário: ${transaction.email}`, 20, 40);
-    doc.text(`Quantia Enviada: ${transaction.amount}`, 20, 60);
-    doc.text(`Data: ${transaction.date}`, 20, 80);
-
-    doc.save("comprovante_transacao.pdf");
-  };
-
   const handleBack = () => {
     navigate('/home');
+  };
+
+  const handleAction = (command) => {
+    command.execute();
   };
 
   return (
@@ -51,8 +68,16 @@ const TransactionHistory = () => {
                 <p><strong>Data:</strong> {transaction.date}</p>
               </div>
               <ButtonContainer>
-                <ActionButton onClick={() => handleGeneratePDF(transaction)}>Gerar PDF</ActionButton>
-                <ActionButton onClick={() => handleDelete(index)}>Excluir</ActionButton>
+                <ActionButton 
+                  onClick={() => handleAction(new GeneratePDFCommand(transaction))}
+                >
+                  Gerar PDF
+                </ActionButton>
+                <ActionButton 
+                  onClick={() => handleAction(new DeleteTransactionCommand(index, transactions, setTransactions))}
+                >
+                  Excluir
+                </ActionButton>
               </ButtonContainer>
             </TransactionItem>
           ))}
